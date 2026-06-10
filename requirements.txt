@@ -1,7 +1,7 @@
 streamlit
 google-generativeai
-faiss-cpu
 pypdf
 python-docx
 pandas
 numpy
+faiss-cpu
