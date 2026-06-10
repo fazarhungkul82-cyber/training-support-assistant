@@ -3,11 +3,19 @@ import streamlit as st
 from modules.ai import ask_ai
 from modules.rag import retrieve_relevant_pdf
 
+# ======================
+# PAGE CONFIG
+# ======================
+
 st.set_page_config(
     page_title="Training Support Assistant",
     page_icon="🎓",
     layout="wide"
 )
+
+# ======================
+# SIDEBAR
+# ======================
 
 st.sidebar.title("🎓 Training Support Assistant")
 
@@ -20,115 +28,189 @@ mode = st.sidebar.radio(
         "✅ Checklist Builder"
     ]
 )
+
+# ======================
+# SOP ASSISTANT
+# ======================
+
 if mode == "📚 SOP Assistant":
 
-    st.header("📚 SOP Assistant")
+    st.title("📚 SOP Assistant")
 
     question = st.text_input(
-        "Tanyakan SOP"
+        "Tanyakan sesuatu terkait SOP"
     )
 
-    if st.button("Cari Jawaban"):
+    if st.button("🔍 Cari Jawaban"):
 
-        doc = retrieve_relevant_pdf(
-            question
-        )
+        if question:
 
-        answer = ask_ai(
-            doc["content"],
-            question
-        )
+            try:
 
-        st.success(
-            f"SOP digunakan: {doc['filename']}"
-        )
+                doc = retrieve_relevant_pdf(
+                    question
+                )
 
-        st.write(answer)
-        elif mode == "📱 WA Generator":
+                st.info(
+                    f"SOP yang digunakan: {doc['filename']}"
+                )
 
-    st.header("📱 WA Generator")
+                answer = ask_ai(
+                    doc["content"],
+                    question
+                )
+
+                st.markdown("### Jawaban")
+                st.write(answer)
+
+            except Exception as e:
+
+                st.error(
+                    f"Terjadi kesalahan: {e}"
+                )
+
+        else:
+
+            st.warning(
+                "Silakan masukkan pertanyaan."
+            )
+
+# ======================
+# WA GENERATOR
+# ======================
+
+elif mode == "📱 WA Generator":
+
+    st.title("📱 WA Generator")
 
     detail = st.text_area(
-        "Masukkan informasi kegiatan"
+        "Masukkan informasi kegiatan",
+        height=200
     )
 
-    if st.button("Generate WA"):
+    if st.button("📨 Generate WA"):
 
-        prompt = f"""
+        if detail:
+
+            prompt = f"""
 Buatkan pesan WhatsApp profesional.
 
-Informasi:
+Informasi kegiatan:
+
 {detail}
 
-Gunakan bahasa formal dan ramah.
+Gunakan bahasa formal, ramah, dan siap kirim.
 """
 
-        result = ask_ai(
-            "",
-            prompt
-        )
+            result = ask_ai(
+                "",
+                prompt
+            )
 
-        st.text_area(
-            "Hasil",
-            result,
-            height=250
-        )
-        elif mode == "📧 Email Generator":
+            st.markdown("### Hasil")
 
-    st.header("📧 Email Generator")
+            st.text_area(
+                "",
+                result,
+                height=300
+            )
+
+        else:
+
+            st.warning(
+                "Masukkan detail kegiatan terlebih dahulu."
+            )
+
+# ======================
+# EMAIL GENERATOR
+# ======================
+
+elif mode == "📧 Email Generator":
+
+    st.title("📧 Email Generator")
 
     detail = st.text_area(
-        "Masukkan detail email"
+        "Masukkan detail email",
+        height=200
     )
 
-    if st.button("Generate Email"):
+    if st.button("📩 Generate Email"):
 
-        prompt = f"""
+        if detail:
+
+            prompt = f"""
 Buatkan email profesional.
 
 Informasi:
+
 {detail}
+
+Struktur:
+- Subject
+- Salam Pembuka
+- Isi Email
+- Penutup
 """
 
-        result = ask_ai(
-            "",
-            prompt
-        )
+            result = ask_ai(
+                "",
+                prompt
+            )
 
-        st.text_area(
-            "Draft Email",
-            result,
-            height=350
-        )
+            st.markdown("### Draft Email")
+
+            st.text_area(
+                "",
+                result,
+                height=400
+            )
+
+        else:
+
+            st.warning(
+                "Masukkan detail email terlebih dahulu."
+            )
+
+# ======================
+# CHECKLIST BUILDER
+# ======================
+
 elif mode == "✅ Checklist Builder":
 
-    st.header("✅ Checklist Builder")
+    st.title("✅ Checklist Builder")
 
     program = st.selectbox(
-        "Jenis Program",
+        "Pilih Jenis Program",
         [
             "CAPM",
             "FLDP",
-            "Leadership",
-            "Certification"
+            "Leadership Development",
+            "Certification Program",
+            "Workshop",
+            "Inhouse Training"
         ]
     )
 
-    if st.button("Generate Checklist"):
+    if st.button("📝 Generate Checklist"):
 
         prompt = f"""
 Buat checklist operasional lengkap
 untuk program {program}.
 
-Format:
-- Pra Pelatihan
-- Saat Pelatihan
-- Pasca Pelatihan
+Kelompokkan menjadi:
+
+1. Pra Pelatihan
+2. Saat Pelatihan
+3. Pasca Pelatihan
+
+Gunakan format checklist.
 """
 
         result = ask_ai(
             "",
             prompt
         )
+
+        st.markdown("### Checklist")
 
         st.write(result)
