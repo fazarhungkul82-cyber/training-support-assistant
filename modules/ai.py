@@ -15,7 +15,7 @@ def ask_ai(context, question):
         system_prompt = f.read()
 
     response = client.chat.completions.create(
-        model="gpt-4.1-mini",
+        model="gemini-3-flash-preview",
         messages=[
             {
                 "role":"system",
