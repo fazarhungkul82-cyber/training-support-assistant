@@ -9,22 +9,23 @@ model = genai.GenerativeModel("gemini-3-flash-preview")
 
 def ask_ai(context, question):
 
-    prompt = f"""
-Anda adalah Training Support Assistant.
+    if context:
 
-Gunakan SOP berikut sebagai sumber utama:
+        prompt = f"""
+Gunakan SOP berikut:
 
 {context}
 
 Pertanyaan:
 {question}
-
-Instruksi:
-- Jawab hanya berdasarkan SOP
-- Jika tidak ada informasi, katakan tidak tersedia
-- Gunakan langkah-langkah jika berupa proses
 """
 
-    response = model.generate_content(prompt)
+    else:
+
+        prompt = question
+
+    response = model.generate_content(
+        prompt
+    )
 
     return response.text
