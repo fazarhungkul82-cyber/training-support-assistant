@@ -1,16 +1,22 @@
 from pypdf import PdfReader
+from pathlib import Path
 
-def read_pdf(uploaded_file):
+def load_all_sop():
 
-    reader = PdfReader(uploaded_file)
+    folder = Path("data/sop")
 
-    text = ""
+    all_text = ""
 
-    for page in reader.pages:
+    for file in folder.glob("*.pdf"):
 
-        page_text = page.extract_text()
+        reader = PdfReader(file)
 
-        if page_text:
-            text += page_text + "\n"
+        for page in reader.pages:
 
-    return text
+            text = page.extract_text()
+
+            if text:
+                all_text += f"\n\n=== {file.name} ===\n"
+                all_text += text
+
+    return all_text
