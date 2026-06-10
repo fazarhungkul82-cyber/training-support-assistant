@@ -1,6 +1,6 @@
 import streamlit as st
 
-from modules.rag import read_pdf
+from modules.rag import load_all_sop
 from modules.ai import ask_ai
 
 st.set_page_config(
@@ -10,60 +10,24 @@ st.set_page_config(
 )
 
 st.title("🎓 Training Support Assistant")
-st.caption("AI Assistant untuk SOP dan Operasional Training")
 
-# Session state
-if "context" not in st.session_state:
-    st.session_state.context = ""
+# Load SOP otomatis dari folder
+with st.spinner("Memuat SOP..."):
+    context = load_all_sop()
 
-# Upload SOP
-uploaded_file = st.file_uploader(
-    "Upload SOP PDF",
-    type=["pdf"]
-)
+st.success("SOP berhasil dimuat")
 
-if uploaded_file:
+st.markdown("### Tanya SOP")
 
-    with st.spinner("Membaca SOP..."):
-        context = read_pdf(uploaded_file)
-        st.session_state.context = context
+question = st.text_input("Masukkan pertanyaan")
 
-    st.success("✅ SOP berhasil diunggah dan dibaca")
+if st.button("Tanya AI"):
 
-    with st.expander("Preview SOP"):
-        st.text(context[:2000])
-
-# Area pertanyaan
-question = st.text_input(
-    "Tanyakan sesuatu tentang SOP"
-)
-
-col1, col2 = st.columns(2)
-
-with col1:
-    ask_button = st.button("🔍 Tanya SOP")
-
-with col2:
-    clear_button = st.button("🗑️ Reset")
-
-if clear_button:
-    st.session_state.context = ""
-    st.rerun()
-
-if ask_button:
-
-    if not st.session_state.context:
-        st.warning("Upload SOP terlebih dahulu.")
-    elif not question:
-        st.warning("Masukkan pertanyaan.")
+    if not question:
+        st.warning("Tulis pertanyaan dulu")
     else:
-
-        with st.spinner("Gemini sedang menganalisis SOP..."):
-
-            answer = ask_ai(
-                st.session_state.context,
-                question
-            )
+        with st.spinner("AI sedang berpikir..."):
+            answer = ask_ai(context, question)
 
         st.markdown("### Jawaban")
         st.write(answer)
