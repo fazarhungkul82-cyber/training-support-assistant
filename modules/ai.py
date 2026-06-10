@@ -1,27 +1,31 @@
 import streamlit as st
-from google import genai
+import google.generativeai as genai
 
-client = genai.Client(
+genai.configure(
     api_key=st.secrets["GEMINI_API_KEY"]
+)
+
+model = genai.GenerativeModel(
+    "gemini-3-flash-preview"
 )
 
 def ask_ai(context, question):
 
     prompt = f"""
-    Anda adalah Training Support Assistant.
+Anda adalah Training Support Assistant.
 
-    Konteks SOP:
-    {context}
+Konteks SOP:
+{context}
 
-    Pertanyaan:
-    {question}
+Pertanyaan:
+{question}
 
-    Jawab hanya berdasarkan konteks SOP.
-    """
+Jawab hanya berdasarkan SOP.
+Jika tidak ada informasi, katakan tidak ditemukan.
+"""
 
-    response = client.models.generate_content(
-        model="gemini-3-flash-preview",
-        contents=prompt
+    response = model.generate_content(
+        prompt
     )
 
     return response.text
