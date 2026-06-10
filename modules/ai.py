@@ -1,38 +1,27 @@
-from openai import OpenAI
 import streamlit as st
+from google import genai
 
-client = OpenAI(
-    api_key=st.secrets["OPENAI_API_KEY"]
+client = genai.Client(
+    api_key=st.secrets["GEMINI_API_KEY"]
 )
 
 def ask_ai(context, question):
 
-    with open(
-        "prompts/system_prompt.txt",
-        "r",
-        encoding="utf-8"
-    ) as f:
-        system_prompt = f.read()
+    prompt = f"""
+    Anda adalah Training Support Assistant.
 
-    response = client.chat.completions.create(
+    Konteks SOP:
+    {context}
+
+    Pertanyaan:
+    {question}
+
+    Jawab hanya berdasarkan konteks SOP.
+    """
+
+    response = client.models.generate_content(
         model="gemini-3-flash-preview",
-        messages=[
-            {
-                "role":"system",
-                "content":system_prompt
-            },
-            {
-                "role":"user",
-                "content":f"""
-Context:
-{context}
-
-Question:
-{question}
-"""
-            }
-        ],
-        temperature=0.2
+        contents=prompt
     )
 
-    return response.choices[0].message.content
+    return response.text
